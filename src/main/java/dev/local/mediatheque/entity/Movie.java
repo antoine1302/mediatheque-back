@@ -34,6 +34,10 @@ public class Movie extends AbstractEntity {
     @OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
     private Set<SubjectMovie> subjectMovies;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="deleted_at")
+    private Date deletedAt;
+
     public Movie(){}
 
     public Movie(@NotBlank @Size(min = 1, max = 200) String title, Long duration, String synopsis, Date releaseDate, Set<SubjectMovie> subjectMovies) {
@@ -90,5 +94,13 @@ public class Movie extends AbstractEntity {
 
     public void setSubjectMovies(Set<SubjectMovie> subjectMovies) {
         this.subjectMovies = subjectMovies;
+    }
+
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

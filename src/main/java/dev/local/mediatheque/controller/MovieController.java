@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public class MovieController {
     @CrossOrigin
     @GetMapping("/movies")
     public Page<Movie> getMovies(Pageable pageable) {
-        return movieRepository.findAll(pageable);
+        return movieRepository.findAllByDeletedAtNull(pageable);
     }
 
     @CrossOrigin
@@ -95,14 +96,14 @@ public class MovieController {
         subjectMovieRepository.deleteAll(subjectMovieListToDel);
 
         Set<SubjectMovie> subjectMovieListToAdd = movieRequest.getSubjectMovies();
-        for(SubjectMovie subjectmovie : subjectMovieListToAdd){
+        for (SubjectMovie subjectmovie : subjectMovieListToAdd) {
             subjectmovie.getId().setMovieId(movieUpdated.getId());
             subjectmovie.setMovie(movieUpdated);
 
-            Role role = roleRepository.findById(subjectmovie.getId().getRoleId()).orElseThrow(()->new ResourceNotFoundException(""));
+            Role role = roleRepository.findById(subjectmovie.getId().getRoleId()).orElseThrow(() -> new ResourceNotFoundException(""));
             subjectmovie.setRole(role);
 
-            Subject subject = subjectRepository.findById(subjectmovie.getId().getSubjectId()).orElseThrow(()->new ResourceNotFoundException(""));
+            Subject subject = subjectRepository.findById(subjectmovie.getId().getSubjectId()).orElseThrow(() -> new ResourceNotFoundException(""));
             subjectmovie.setSubject(subject);
         }
         subjectMovieRepository.saveAll(subjectMovieListToAdd);
@@ -115,7 +116,8 @@ public class MovieController {
     public ResponseEntity<?> deleteMovie(@PathVariable Long movieId) {
         return movieRepository.findById(movieId)
                 .map(movie -> {
-                    movieRepository.delete(movie);
+                    movie.setDeletedAt(new Date());
+                    movieRepository.save(movie);
                     return ResponseEntity.ok().build();
                 }).orElseThrow(() -> new ResourceNotFoundException("Movie not found with id " + movieId));
     }

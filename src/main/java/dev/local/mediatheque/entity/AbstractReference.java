@@ -1,10 +1,9 @@
 package dev.local.mediatheque.entity;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 @MappedSuperclass
 public abstract class AbstractReference extends AbstractEntity {
@@ -30,6 +29,10 @@ public abstract class AbstractReference extends AbstractEntity {
 
     @Column(columnDefinition = "integer default 100", nullable = false)
     private Integer weight = 100;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="deleted_at")
+    private Date deletedAt;
 
     public AbstractReference(){}
 
@@ -83,5 +86,13 @@ public abstract class AbstractReference extends AbstractEntity {
 
     public void setWeight(Integer weight) {
         this.weight = weight;
+    }
+
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

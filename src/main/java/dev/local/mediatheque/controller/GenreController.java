@@ -17,16 +17,26 @@ public class GenreController {
     @Autowired
     private GenreRepository genreRepository;
 
+    @CrossOrigin
     @GetMapping("/genres")
     public Page<Genre> getGenres(Pageable pageable) {
         return genreRepository.findAll(pageable);
     }
 
+    @CrossOrigin
+    @GetMapping("/genres/{genreId}")
+    public Genre getGenre(@PathVariable Long genreId) {
+        return genreRepository.findById(genreId)
+                .orElseThrow(() -> new ResourceNotFoundException("Genre not found with id " + genreId));
+    }
+
+    @CrossOrigin
     @PostMapping("/genres")
     public Genre createGenre(@Valid @RequestBody Genre genre) {
         return genreRepository.save(genre);
     }
 
+    @CrossOrigin
     @PutMapping("/genres/{genreId}")
     public Genre updateGenre(
             @PathVariable Long genreId,
@@ -43,6 +53,7 @@ public class GenreController {
                 }).orElseThrow(() -> new ResourceNotFoundException("Genre not found with id " + genreId));
     }
 
+    @CrossOrigin
     @DeleteMapping("/genres/{genreId}")
     public ResponseEntity<?> deleteGenre(@PathVariable Long genreId) {
         return genreRepository.findById(genreId)

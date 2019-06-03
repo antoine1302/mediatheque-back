@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -20,21 +21,31 @@ public class RoleController {
 
     @CrossOrigin
     @GetMapping("/roles/list")
-    public List<Role> getRolesAsKeyValue(){
+    public List<Role> getRolesAsKeyValue() {
         return roleRepository.getAllActiveRole();
     }
 
+    @CrossOrigin
     @GetMapping("/roles")
     public Page<Role> getRoles(Pageable pageable) {
-        return roleRepository.findAll(pageable);
+        return roleRepository.findAllByDeletedAtNull(pageable);
     }
 
+    @CrossOrigin
+    @GetMapping("/roles/{roleId}")
+    public Role getRole(@PathVariable Long roleId) {
+        return roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId));
+    }
+
+    @CrossOrigin
     @PostMapping("/roles")
     public Role createRole(@Valid @RequestBody Role role) {
 
         return roleRepository.save(role);
     }
 
+    @CrossOrigin
     @PutMapping("/roles/{roleId}")
     public Role updateRole(
             @PathVariable Long roleId,
@@ -51,11 +62,13 @@ public class RoleController {
                 }).orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId));
     }
 
+    @CrossOrigin
     @DeleteMapping("/roles/{roleId}")
     public ResponseEntity<?> deleteRole(@PathVariable Long roleId) {
         return roleRepository.findById(roleId)
                 .map(role -> {
-                    roleRepository.delete(role);
+                    role.setDeletedAt((new Date()));
+                    roleRepository.save(role);
                     return ResponseEntity.ok().build();
                 }).orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId));
     }

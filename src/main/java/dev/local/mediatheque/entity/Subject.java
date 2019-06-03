@@ -36,6 +36,10 @@ public class Subject {
     @OneToMany(mappedBy = "subject")
     private Set<SubjectMovie> subjectMovies;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="deleted_at")
+    private Date deletedAt;
+
     public Subject(){}
 
     public Subject(@NotBlank @Size(min = 1, max = 100) String firstname, @NotBlank @Size(min = 1, max = 100) String lastname, Date dateOfBirth, @NotBlank @Size(min = 1, max = 100) String citizenship, @NotBlank @Size(min = 1, max = 100) String placeOfBirth, Set<SubjectMovie> subjectMovies) {
@@ -93,6 +97,14 @@ public class Subject {
 
     public void setPlaceOfBirth(String placeOfBirth) {
         this.placeOfBirth = placeOfBirth;
+    }
+
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     public Set<SubjectMovie> getSubjectMovies() {

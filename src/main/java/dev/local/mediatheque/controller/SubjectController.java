@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 
 @RestController
 public class SubjectController {
@@ -19,15 +20,24 @@ public class SubjectController {
 
     @CrossOrigin
     @GetMapping("/subjects")
-    public Page<Subject> getSubject(Pageable pageable) {
-        return subjectRepository.findAll(pageable);
+    public Page<Subject> getSubjects(Pageable pageable) {
+        return subjectRepository.findAllByDeletedAtNull(pageable);
     }
 
+    @CrossOrigin
+    @GetMapping("/subjects/{subjectId}")
+    public Subject getSubject(@PathVariable Long subjectId) {
+        return subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id " + subjectId));
+    }
+
+    @CrossOrigin
     @PostMapping("/subjects")
     public Subject createSubject(@Valid @RequestBody Subject subject) {
         return subjectRepository.save(subject);
     }
 
+    @CrossOrigin
     @PutMapping("/subjects/{subjectId}")
     public Subject updateSubject(
             @PathVariable Long subjectId,
@@ -44,11 +54,13 @@ public class SubjectController {
                 }).orElseThrow(() -> new ResourceNotFoundException("Subject not found with id " + subjectId));
     }
 
+    @CrossOrigin
     @DeleteMapping("/subjects/{subjectId}")
     public ResponseEntity<?> deleteSubject(@PathVariable Long subjectId) {
         return subjectRepository.findById(subjectId)
                 .map(subject -> {
-                    subjectRepository.delete(subject);
+                    subject.setDeletedAt(new Date());
+                    subjectRepository.save(subject);
                     return ResponseEntity.ok().build();
                 }).orElseThrow(() -> new ResourceNotFoundException("Subject not found with id " + subjectId));
     }
