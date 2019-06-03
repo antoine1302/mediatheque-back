@@ -7,6 +7,5 @@
 
 ### TODO
 
-- ajouter de nouveaux endpoints pour la creation/edition des genres
 - ajouter de nouveaux endpoints pour la gestion du lazyloading
 - ajouter des tests unitaires
